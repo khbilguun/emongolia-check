@@ -110,7 +110,9 @@
     <span class="active">Монгол бичгийн хувилбар</span>
   </div>
   <div class="topbar-right">
-    <span>🌤 +18.7°C</span><span>💱 3,575₮</span><span>📅 6 сарын 9</span>
+    <span id="weather-info">🌤 ...</span>
+    <span id="exchange-info">💱 ...</span>
+    <span id="date-info">📅 ...</span>
   </div>
 </div>
 
@@ -330,6 +332,64 @@ document.getElementById("captchaInput").addEventListener("keydown", function(e) 
 });
 
 drawCaptcha();
+
+// ===== DYNAMIC TOPBAR =====
+
+// Өдрийн огноо (Монгол)
+function updateDate() {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  document.getElementById("date-info").textContent = "📅 " + month + " сарын " + day;
+}
+
+// Цаг агаар — OpenMeteo (үнэгүй, API key хэрэггүй) — Улаанбаатар
+async function updateWeather() {
+  try {
+    const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=47.9077&longitude=106.8832&current=temperature_2m,weathercode&timezone=Asia%2FUlaanbaatar");
+    const data = await res.json();
+    const temp = Math.round(data.current.temperature_2m);
+    const code = data.current.weathercode;
+    let icon = "🌤";
+    if (code === 0) icon = "☀️";
+    else if (code <= 3) icon = "🌤";
+    else if (code <= 48) icon = "🌫";
+    else if (code <= 67) icon = "🌧";
+    else if (code <= 77) icon = "❄️";
+    else if (code <= 82) icon = "🌦";
+    else icon = "⛈";
+    document.getElementById("weather-info").textContent = icon + " " + (temp > 0 ? "+" : "") + temp + "°C";
+  } catch(e) {
+    document.getElementById("weather-info").textContent = "🌤 --°C";
+  }
+}
+
+// Ханш — exchangerate-api (үнэгүй)
+async function updateExchange() {
+  try {
+    const res = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
+    const data = await res.json();
+    const mnt = Math.round(data.rates.MNT);
+    document.getElementById("exchange-info").textContent = "💱 " + mnt.toLocaleString() + "₮";
+  } catch(e) {
+    // fallback: open.er-api.com
+    try {
+      const res2 = await fetch("https://open.er-api.com/v6/latest/USD");
+      const data2 = await res2.json();
+      const mnt2 = Math.round(data2.rates.MNT);
+      document.getElementById("exchange-info").textContent = "💱 " + mnt2.toLocaleString() + "₮";
+    } catch(e2) {
+      document.getElementById("exchange-info").textContent = "💱 --₮";
+    }
+  }
+}
+
+updateDate();
+updateWeather();
+updateExchange();
+
+// 10 минут тутамд шинэчлэх
+setInterval(() => { updateWeather(); updateExchange(); updateDate(); }, 10 * 60 * 1000);
 </script>
 </body>
 </html>
