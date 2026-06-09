@@ -12,6 +12,12 @@
     .topbar-left { display: flex; gap: 20px; }
     .topbar-left span.active { color: #1a3a9e; font-weight: 600; }
     .topbar-right { display: flex; gap: 18px; }
+    .topbar-item { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: #444; }
+    .topbar-item .t-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+    .t-icon.weather { background: #fff8e1; }
+    .t-icon.money { background: #e8f5e9; color: #2e7d32; font-size: 12px; font-weight: 700; border: 1.5px solid #a5d6a7; }
+    .t-icon.cal { background: #e3f2fd; font-size: 11px; }
+    .topbar-item span.val { font-weight: 500; color: #222; }
 
     header { background: #fff; border-bottom: 1px solid #e8eaf0; padding: 10px 32px; display: flex; align-items: center; justify-content: space-between; }
     .header-left { display: flex; align-items: center; gap: 14px; }
@@ -77,8 +83,11 @@
     .side-btn { width: 40px; height: 40px; background: #fff; border: 1px solid #dde2f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 
     @media (max-width: 700px) {
-      .topbar { padding: 4px 12px; font-size: 11px; }
-      .topbar-right { gap: 8px; font-size: 11px; }
+      .topbar { padding: 6px 12px; font-size: 11px; }
+      .topbar-right { gap: 10px; }
+      .topbar-item { gap: 4px; }
+      .topbar-item .val { font-size: 11px; }
+      .t-icon { width: 20px; height: 20px; font-size: 11px; }
       header { padding: 8px 12px; }
       .header-right gap { gap: 10px; }
       .btn-login { padding: 7px 14px; font-size: 12px; }
@@ -123,9 +132,18 @@
     <span class="active">Монгол бичгийн хувилбар</span>
   </div>
   <div class="topbar-right">
-    <span id="weather-info">🌤 ...</span>
-    <span id="exchange-info">$ ...</span>
-    <span id="date-info">📅 ...</span>
+    <div class="topbar-item">
+      <div class="t-icon weather" id="weather-icon">☁️</div>
+      <span class="val" id="weather-val">...</span>
+    </div>
+    <div class="topbar-item">
+      <div class="t-icon money">$</div>
+      <span class="val" id="exchange-val">...</span>
+    </div>
+    <div class="topbar-item">
+      <div class="t-icon cal">📅</div>
+      <span class="val" id="date-val">...</span>
+    </div>
   </div>
 </div>
 
@@ -355,7 +373,7 @@ function updateDate() {
   const now = new Date();
   const month = now.getMonth() + 1;
   const day = now.getDate();
-  document.getElementById("date-info").textContent = "📅 " + month + " сарын " + day;
+  document.getElementById("date-val").textContent = month + " сарын " + day;
 }
 
 // Цаг агаар — OpenMeteo (үнэгүй, API key хэрэггүй) — Улаанбаатар
@@ -373,9 +391,9 @@ async function updateWeather() {
     else if (code <= 77) icon = "❄️";
     else if (code <= 82) icon = "🌦";
     else icon = "⛈";
-    document.getElementById("weather-info").textContent = icon + " " + (temp > 0 ? "+" : "") + temp + "°C";
+    document.getElementById("weather-icon").textContent = icon; document.getElementById("weather-val").textContent = (temp > 0 ? "+" : "") + temp + "°C";
   } catch(e) {
-    document.getElementById("weather-info").textContent = "🌤 --°C";
+    document.getElementById("weather-val").textContent = "--°C";
   }
 }
 
@@ -385,16 +403,16 @@ async function updateExchange() {
     const res = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
     const data = await res.json();
     const mnt = Math.round(data.rates.MNT);
-    document.getElementById("exchange-info").textContent = "$ " + mnt.toLocaleString() + "₮";
+    document.getElementById("exchange-val").textContent = mnt.toLocaleString() + "₮";
   } catch(e) {
     // fallback: open.er-api.com
     try {
       const res2 = await fetch("https://open.er-api.com/v6/latest/USD");
       const data2 = await res2.json();
       const mnt2 = Math.round(data2.rates.MNT);
-      document.getElementById("exchange-info").textContent = "$ " + mnt2.toLocaleString() + "₮";
+      document.getElementById("exchange-val").textContent = mnt2.toLocaleString() + "₮";
     } catch(e2) {
-      document.getElementById("exchange-info").textContent = "$ --₮";
+      document.getElementById("exchange-val").textContent = "--₮";
     }
   }
 }
