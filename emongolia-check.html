@@ -124,7 +124,7 @@
   </div>
   <div class="topbar-right">
     <span id="weather-info">🌤 ...</span>
-    <span id="exchange-info">💱 ...</span>
+    <span id="exchange-info">$ ...</span>
     <span id="date-info">📅 ...</span>
   </div>
 </div>
@@ -135,10 +135,7 @@
     <button class="dark-toggle">🌙</button>
   </div>
   <div class="header-right">
-    <button class="btn-search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
-      Хайлт
-    </button>
+
     <button class="btn-login" onclick="window.open('https://sso.gov.mn/login?response_type=code&client_id=e859507cb6753191fdc5e603-6eca8a874580cb019c762145b232684e&scope=W3sid3NkbCI6Imh0dHBzOi8veHlwLmdvdi5tbi9nb3Zlcm5tZW50LXNlcnZpY2UtMS41LjAvd3M/V1NETCIsInNlcnZpY2VzIjpbIkdTMTAwMzZfZ2V0Q2hpbGRJbmZvIl19LHsid3NkbCI6Imh0dHBzOi8veHlwLmdvdi5tbi9jaXRpemVuLTEuNS4wL3dzP1dTREwiLCJzZXJ2aWNlcyI6WyJXUzEwMDEwMV9nZXRDaXRpemVuSURDYXJkSW5mbyJdfV0=&redirect_uri=https://sso.e-mongolia.mn/sso-api/sso/access-grant&state=eyJhY3Rpb24iOiJMT0dJTiIsInV1aWQiOiI2ZmJjMDliMi00NmI5LTQ1MTItYWU0NS0wMTlmYTA0Y2FjYmUtMTc4MDk4OTQzNDI2MyIsImxvbmciOmZhbHNlfQ==', '_blank')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       Нэвтрэх
@@ -378,16 +375,16 @@ async function updateExchange() {
     const res = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
     const data = await res.json();
     const mnt = Math.round(data.rates.MNT);
-    document.getElementById("exchange-info").textContent = "💱 " + mnt.toLocaleString() + "₮";
+    document.getElementById("exchange-info").textContent = "$ " + mnt.toLocaleString() + "₮";
   } catch(e) {
     // fallback: open.er-api.com
     try {
       const res2 = await fetch("https://open.er-api.com/v6/latest/USD");
       const data2 = await res2.json();
       const mnt2 = Math.round(data2.rates.MNT);
-      document.getElementById("exchange-info").textContent = "💱 " + mnt2.toLocaleString() + "₮";
+      document.getElementById("exchange-info").textContent = "$ " + mnt2.toLocaleString() + "₮";
     } catch(e2) {
-      document.getElementById("exchange-info").textContent = "💱 --₮";
+      document.getElementById("exchange-info").textContent = "$ --₮";
     }
   }
 }
